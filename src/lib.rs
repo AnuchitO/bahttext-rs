@@ -11,31 +11,41 @@ pub fn words(money: f64) -> String {
 mod tests {
     use super::*;
 
-    #[test]
-    fn words_single_digit_zero() {
-        let got = words(0.0);
-
-        assert_eq!(got, "ศูนย์บาทถ้วน");
+    struct Case {
+        name: &'static str,
+        money: f64,
+        expect: &'static str,
     }
 
     #[test]
-    fn words_single_digit_one() {
-        let got = words(1.0);
+    fn baht_to_words() {
+        let cases = [
+            Case {
+                name: "zero",
+                money: 0.0,
+                expect: "ศูนย์บาทถ้วน",
+            },
+            Case {
+                name: "1",
+                money: 1.0,
+                expect: "หนึ่งบาทถ้วน",
+            },
+            Case {
+                name: "2",
+                money: 2.0,
+                expect: "สองบาทถ้วน",
+            },
+            Case {
+                name: "3",
+                money: 3.0,
+                expect: "สามบาทถ้วน",
+            },
+        ];
 
-        assert_eq!(got, "หนึ่งบาทถ้วน");
-    }
+        for cs in &cases {
+            let result = words(cs.money);
 
-    #[test]
-    fn words_single_digit_two() {
-        let got = words(2.0);
-
-        assert_eq!(got, "สองบาทถ้วน");
-    }
-
-    #[test]
-    fn words_single_digit_three() {
-        let got = words(3.0);
-
-        assert_eq!(got, "สามบาทถ้วน");
+            assert_eq!(result, cs.expect, "Fail case: {}", cs.name);
+        }
     }
 }
