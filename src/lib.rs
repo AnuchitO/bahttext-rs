@@ -11,41 +11,19 @@ pub fn words(money: f64) -> String {
 mod tests {
     use super::*;
 
-    struct Case {
-        name: &'static str,
-        money: f64,
-        expect: &'static str,
-    }
-
     #[test]
     fn baht_to_words() {
         let cases = [
-            Case {
-                name: "zero",
-                money: 0.0,
-                expect: "ศูนย์บาทถ้วน",
-            },
-            Case {
-                name: "1",
-                money: 1.0,
-                expect: "หนึ่งบาทถ้วน",
-            },
-            Case {
-                name: "2",
-                money: 2.0,
-                expect: "สองบาทถ้วน",
-            },
-            Case {
-                name: "3",
-                money: 3.0,
-                expect: "สามบาทถ้วน",
-            },
+            ("zero", 0.0, "ศูนย์บาทถ้วน"),
+            ("one", 1.0, "หนึ่งบาทถ้วน"),
+            ("two", 2.0, "สองบาทถ้วน"),
+            ("three", 3.0, "สามบาทถ้วน"),
         ];
 
-        for cs in &cases {
-            let result = words(cs.money);
+        for &(name, money, expect) in &cases {
+            let result = words(money);
 
-            assert_eq!(result, cs.expect, "Fail case: {}", cs.name);
+            assert_eq!(result, expect, "Fail case: {}", name);
         }
     }
 }
