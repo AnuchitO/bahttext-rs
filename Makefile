@@ -28,3 +28,7 @@ fuzz-init:
 .PHONY: fuzz
 fuzz:
 	cargo fuzz run fuzz_target_1 -- -max_total_time=60
+
+.PHONY: test-integration
+test-integration:
+	cargo test --all-targets
