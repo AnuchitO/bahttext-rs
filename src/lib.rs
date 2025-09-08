@@ -1,4 +1,3 @@
-use std::fmt::Write;
 use std::error::Error;
 use std::fmt;
 
@@ -30,11 +29,9 @@ pub fn words(money: f64) -> String {
 
     let baht_text = money_to_thai_words(whole_baht);
 
-    if satang == 0 {
-        format!("{}{}บาทถ้วน", minus, baht_text)
-    } else {
-        let satang_text = money_to_thai_words(satang);
-        format!("{}{}บาท{}สตางค์", minus, baht_text, satang_text)
+    match satang {
+        0 => format!("{}{}บาทถ้วน", minus, baht_text),
+        _ => format!("{}{}บาท{}สตางค์", minus, baht_text, money_to_thai_words(satang)),
     }
 }
 
@@ -43,19 +40,14 @@ fn money_to_thai_words(money: u64) -> String {
         return "ศูนย์".to_string();
     }
 
-    let mut baht_text = String::new();
+    let mut baht_text = String::with_capacity(128);
     let mut amount = money;
 
     if amount >= 1_000_000 {
-        let million_part = amount / 1_000_000;
+        let millions = amount / 1_000_000;
         amount %= 1_000_000;
-        write!(
-            &mut baht_text,
-            "{}{}",
-            money_to_thai_words(million_part),
-            UNIT_PLACES[6]
-        )
-        .unwrap();
+        baht_text.push_str(&money_to_thai_words(millions));
+        baht_text.push_str(UNIT_PLACES[6]);
     }
 
     let s = amount.to_string();
@@ -85,19 +77,25 @@ fn money_to_thai_words(money: u64) -> String {
     baht_text
 }
 
-/// Error type for bahttext operations
-#[derive(Debug)]
+/// Error types for bahttext operations
+#[derive(Debug, PartialEq)]
 pub enum BahtTextError {
     /// Error when parsing string to number fails
     ParseError(String),
+    /// Error when the amount is not a number
+    InvalidNumber,
+    /// Error when the amount is too large
+    AmountTooLarge,
 }
 
 impl Error for BahtTextError {}
 
 impl fmt::Display for BahtTextError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            BahtTextError::ParseError(msg) => write!(f, "Failed to parse amount: {}", msg),
+            Self::ParseError(msg) => write!(f, "Failed to parse amount: {}", msg),
+            Self::InvalidNumber => write!(f, "Invalid number format"),
+            Self::AmountTooLarge => write!(f, "Amount is too large"),
         }
     }
 }
@@ -107,6 +105,9 @@ impl fmt::Display for BahtTextError {
 /// # Arguments
 /// * `input` - A string slice that holds the monetary amount (e.g., "1,234.56")
 ///
+/// # Errors
+/// Returns `BahtTextError` if the input cannot be parsed as a valid number
+///
 /// # Examples
 /// ```
 /// use bahttext::words_from;
@@ -115,12 +116,18 @@ impl fmt::Display for BahtTextError {
 /// assert_eq!(result, "หนึ่งพันสองร้อยสามสิบสี่บาทห้าสิบหกสตางค์");
 /// ```
 pub fn words_from(input: &str) -> Result<String, BahtTextError> {
-    let cleaned_input = input.trim().replace(',', "");
-    match cleaned_input.parse::<f64>() {
-        Ok(amount) => Ok(words(amount)),
-        Err(e) => Err(BahtTextError::ParseError(e.to_string())),
-    }
+    let cleaned = input.trim().replace(',', "");
+    cleaned.parse::<f64>()
+        .map_err(|e| BahtTextError::ParseError(e.to_string()))
+        .and_then(|n| {
+            if n.is_finite() {
+                Ok(words(n))
+            } else {
+                Err(BahtTextError::InvalidNumber)
+            }
+        })
 }
+
 
 #[cfg(test)]
 mod tests {
