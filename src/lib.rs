@@ -1,4 +1,6 @@
 use std::fmt::Write;
+use std::error::Error;
+use std::fmt;
 
 const UNIT_WORDS: [&str; 10] = [
     "",
@@ -83,9 +85,68 @@ fn money_to_thai_words(money: u64) -> String {
     baht_text
 }
 
+/// Error type for bahttext operations
+#[derive(Debug)]
+pub enum BahtTextError {
+    /// Error when parsing string to number fails
+    ParseError(String),
+}
+
+impl Error for BahtTextError {}
+
+impl fmt::Display for BahtTextError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            BahtTextError::ParseError(msg) => write!(f, "Failed to parse amount: {}", msg),
+        }
+    }
+}
+
+/// Converts a string representing a monetary amount to Thai text representation.
+///
+/// # Arguments
+/// * `input` - A string slice that holds the monetary amount (e.g., "1,234.56")
+///
+/// # Examples
+/// ```
+/// use bahttext::words_from;
+///
+/// let result = words_from("1,234.56").unwrap();
+/// assert_eq!(result, "หนึ่งพันสองร้อยสามสิบสี่บาทห้าสิบหกสตางค์");
+/// ```
+pub fn words_from(input: &str) -> Result<String, BahtTextError> {
+    let cleaned_input = input.trim().replace(',', "");
+    match cleaned_input.parse::<f64>() {
+        Ok(amount) => Ok(words(amount)),
+        Err(e) => Err(BahtTextError::ParseError(e.to_string())),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_words_from() {
+        // Test with integers
+        assert_eq!(words_from("0").unwrap(), "ศูนย์บาทถ้วน");
+        assert_eq!(words_from("100").unwrap(), "หนึ่งร้อยบาทถ้วน");
+
+        // Test with decimal numbers
+        assert_eq!(words_from("1.50").unwrap(), "หนึ่งบาทห้าสิบสตางค์");
+        assert_eq!(words_from("100.25").unwrap(), "หนึ่งร้อยบาทยี่สิบห้าสตางค์");
+
+        // Test with thousand separators
+        assert_eq!(words_from("1,000").unwrap(), "หนึ่งพันบาทถ้วน");
+        assert_eq!(words_from("1,234.56").unwrap(), "หนึ่งพันสองร้อยสามสิบสี่บาทห้าสิบหกสตางค์");
+
+        // Test with whitespace
+        assert_eq!(words_from(" 1234.56 ").unwrap(), "หนึ่งพันสองร้อยสามสิบสี่บาทห้าสิบหกสตางค์");
+
+        // Test error cases
+        assert!(words_from("abc").is_err());
+        assert!(words_from("1.2.3").is_err());
+    }
 
     #[test]
     fn baht_to_words() {
