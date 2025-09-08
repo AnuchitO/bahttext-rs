@@ -1,7 +1,9 @@
-````
 # THB-to-Text: Thai Baht to Word Conversion Library (Rust)
 
-[![codecov](https://codecov.io/github/AnuchitO/bahttext-rs/graph/badge.svg?token=KD10ZZXFIU)](https://codecov.io/github/AnuchitO/bahttext-rs) [![Rust](https://github.com/anuchito/bahttext-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/anuchito/bahttext-rs/actions/workflows/ci.yml) [![Crates.io](https://img.shields.io/crates/v/bahttext)](https://crates.io/crates/bahttext) [![Documentation](https://docs.rs/bahttext/badge.svg)](https://docs.rs/bahttext)="140">
+[![codecov](https://codecov.io/github/AnuchitO/bahttext-rs/graph/badge.svg?token=KD10ZZXFIU)](https://codecov.io/github/AnuchitO/bahttext-rs)
+[![Rust](https://github.com/anuchito/bahttext-rs/actions/workflows/ci.yml/badge.svg)](https://github.com/anuchito/bahttext-rs/actions/workflows/ci.yml)
+[![Crates.io](https://img.shields.io/crates/v/bahttext)](https://crates.io/crates/bahttext)
+[![Documentation](https://docs.rs/bahttext/badge.svg)](https://docs.rs/bahttext)
 
 ## 🇹🇭 THB-to-Text
 
