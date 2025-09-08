@@ -14,9 +14,6 @@ dependencies = [
 [[package]]
 name = "bahttext"
 version = "0.1.0"
-dependencies = [
- "arbitrary",
-]
 
 [[package]]
 name = "bahttext-fuzz"

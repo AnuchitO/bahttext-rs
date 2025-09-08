@@ -14,3 +14,17 @@ test-watch-words:
 test-cov:
 	cargo tarpaulin --out html
 	open tarpaulin-report.html
+
+.PHONY: install-dev-tools
+install-dev-tools:
+	cargo install cargo-watch
+	cargo install cargo-tarpaulin
+	cargo install cargo-fuzz
+
+.PHONY: fuzz-init
+fuzz-init:
+	cargo fuzz init
+
+.PHONY: fuzz
+fuzz:
+	cargo fuzz run fuzz_target_1 -- -max_total_time=60

@@ -1,6 +1,22 @@
 [package]
 name = "bahttext"
 version = "0.1.0"
-edition = "2024"
+authors = ["Your Name <your.email@example.com>"]
+edition = "2021"
+description = "A library for converting numbers to Thai baht text representation"
+license = "MIT"
+repository = "https://github.com/yourusername/bahttext-rs"
+
+[features]
+default = []
 
 [dependencies]
+
+[dev-dependencies]
+arbitrary = { version = "1.0", features = ["derive"] }
+
+[workspace]
+members = [
+    ".",
+    "fuzz",
+]
