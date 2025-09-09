@@ -149,10 +149,72 @@ mod tests {
 
         // Test with whitespace
         assert_eq!(words_from(" 1234.56 ").unwrap(), "หนึ่งพันสองร้อยสามสิบสี่บาทห้าสิบหกสตางค์");
+    }
 
-        // Test error cases
-        assert!(words_from("abc").is_err());
-        assert!(words_from("1.2.3").is_err());
+    #[test]
+    fn test_baht_text_error_display() {
+        // Test ParseError
+        let parse_error = BahtTextError::ParseError("invalid format".to_string());
+        assert_eq!(
+            parse_error.to_string(),
+            "Failed to parse amount: invalid format",
+            "Should format ParseError correctly"
+        );
+
+        // Test InvalidNumber
+        let invalid_number = BahtTextError::InvalidNumber;
+        assert_eq!(
+            invalid_number.to_string(),
+            "Invalid number format",
+            "Should format InvalidNumber correctly"
+        );
+
+        // Test AmountTooLarge
+        let amount_too_large = BahtTextError::AmountTooLarge;
+        assert_eq!(
+            amount_too_large.to_string(),
+            "Amount is too large",
+            "Should format AmountTooLarge correctly"
+        );
+    }
+
+    #[test]
+    fn test_words_from_error_cases() {
+        // Test empty string and whitespace only
+        assert!(matches!(
+            words_from("").unwrap_err(),
+            BahtTextError::ParseError(_)
+        ), "Should return ParseError for empty string");
+
+        assert!(matches!(
+            words_from("   ").unwrap_err(),
+            BahtTextError::ParseError(_)
+        ), "Should return ParseError for whitespace only");
+
+        // Test special characters
+        assert!(matches!(
+            words_from("@#$").unwrap_err(),
+            BahtTextError::ParseError(_)
+        ), "Should return ParseError for special characters");
+
+        // Test invalid number formats
+        assert!(matches!(
+            words_from("abc").unwrap_err(),
+            BahtTextError::ParseError(_)
+        ), "Should return ParseError for non-numeric input");
+
+        // Test infinity and NaN
+        assert_eq!(
+            words_from("inf").unwrap_err(),
+            BahtTextError::InvalidNumber,
+            "Should return InvalidNumber for infinity"
+        );
+
+        assert_eq!(
+            words_from("NaN").unwrap_err(),
+            BahtTextError::InvalidNumber,
+            "Should return InvalidNumber for NaN"
+        );
     }
 
     #[test]
